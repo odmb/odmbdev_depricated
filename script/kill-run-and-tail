@@ -1,0 +1,6 @@
+#!/bin/bash
+
+kill -9 $(ps aux | grep xdaq | grep 9000 | awk '{print $2}')
+set -m
+./startME11Dev.sh &> odmbdev.log &
+tail -f -n 100 odmbdev.log
