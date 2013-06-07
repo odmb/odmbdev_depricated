@@ -93,29 +93,29 @@ namespace emu { namespace odmbdev {
            << html().set("lang", "en")
                     .set("dir","ltr")
            << head()
-           << style().set("rel", "stylesheet").set("type", "text/css")
+           << style().set("rel", "stylesheet").set("type", "text/css")<<endl
            << "" // you could add page-wide styles here
            << style()
            << script().set("type", "text/javascript")
            // I appologize to the programming gods for writing JavaScript as
            // a string inside a C++ program ... (NB gcc will concatenate
            // adjacent string literals)
-           << "function toggleSidebox() {"
-              "  var elements = document.getElementsByClassName('sidebox');"
-              "  Array.prototype.slice.call(elements, 0).map("
+           << "function toggleSidebox() {"<<endl
+           << "  var elements = document.getElementsByClassName('sidebox');"<<endl
+           << "  Array.prototype.slice.call(elements, 0).map("
               "    function (e) { "
               "      e.style.display = e.style.display == 'none' ? 'block' "
               "                                                  : 'none'"
               "    })"
               "}"
            << script()
-           << head()
+           << head()<<endl
            << body().set("style",
                          string("padding-bottom: 10em; ")
                          + "color: #333; ")
  	   << cgicc::div().set("style",
-			       string("width: 500px;") +          
-			       "float: left")
+			       string("width: 515px;") +          
+			       "float: left")<<endl
 	   << h1()
            << "ODMB Test Routines - UCSB"
 	   << h1();
@@ -124,46 +124,8 @@ namespace emu { namespace odmbdev {
       // Manuel: html object to browse local drive
       //*out<<endl<<"Select file with VME commands: <input type=file name=VMEfile  size=50 />"<<endl;
       
-      // begin: floating right hand side box
-      //       *out << cgicc::div().set("style",
-      //                                string("position:fixed;") +
-      //                                "float:right;" +
-      //                                "border: #000 solid 1px;" +
-      //                                "top: 1em;" +
-      //                                "right: 1em;" +
-      //                                "padding: 1em;" +
-      //                                "background-color: #eee")
-      //            // the minimize button
-      //            << cgicc::a().set("onclick", "toggleSidebox();")
-      //                         .set("accesskey", "m")
-      //                         .set("style",
-      //                              string("position:absolute;") +
-      //                              "float:right;" +
-      //                              "border: #000 solid 1px;" +
-      //                              "top: 0.5em;" +
-      //                              "right: 0.5em;" +
-      //                              "background-color: #222;" +
-      //                              "color: #eee;" +
-      //                              "font-weight: bold;" +
-      //                              "text-decoration: none;")
-      //            << "&mdash;"
-      //            << cgicc::a()
-      //            << h3().set("class", "sidebox") << "Common Utilities" << h3();
-      
       // this is only for common actions which we always want visible
       for(unsigned int i = 0; i < commonActions.size(); ++i) {
-        // this multi-line statement sets up a form for the action,
-        // which will create buttons, etc. The __action_to_call hidden
-        // form element tells the Manager which action to use when
-        // this form is submitted.
-	//        *out << p()
-	//             << cgicc::form().set("class", "sidebox")
-	//                             .set("method","GET")
-	//                             .set("action", "commonActions")
-	//             << cgicc::input().set("type","hidden")
-	//                              .set("value",numberToString(i))
-	//                              .set("name","__action_to_call")
-	//             << endl;
 	
         commonActions[i]->display(out);
 	
@@ -199,7 +161,7 @@ namespace emu { namespace odmbdev {
 
       *out << cgicc::div();
 
-      *out << cgicc::div().set("style", string("width: 50%;") + "float:left;" + "padding-left: 30px;");
+      *out << cgicc::div().set("style", string("margin-left: 525px;") + "padding-left: 30px;"+ "padding-right: 30px;");
 
       for(unsigned int i = 0; i < logActions.size(); ++i) { // display log buttons at the top
         *out << p()
@@ -218,25 +180,12 @@ namespace emu { namespace odmbdev {
 
       *out << textarea().set("style",
                              string("width: 100%; ")
-                             + "height: 54em; ")
+                             + "height: 930px; ")
            // NB, I purposely called .str(), I don't want to remove all the
            // contents of the log into the web page, I want them to persist
            << this->webOutputLog.str()
            << textarea();
 
-//       for(unsigned int i = 0; i < logActions.size(); ++i) { // display log buttons at the bottom
-//         *out << p()
-// 	     << cgicc::form().set("method","GET")
-//                              .set("action", "logActions")
-//              << cgicc::input().set("type","hidden")
-//                               .set("value",numberToString(i))
-//                               .set("name","__action_to_call");
-
-// 	logActions[i]->display(out);
-
-// 	*out << cgicc::form()
-// 	     << p();
-//       }
       *out << cgicc::div()
            << body() << html();
     }

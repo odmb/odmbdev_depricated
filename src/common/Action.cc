@@ -179,14 +179,14 @@ namespace emu { namespace odmbdev {
       .set("value",textbox_default_value1)
       .set("name",textboxname1) << " times" 
 	 << cgicc::br() << " File: "
-         << cgicc::input().set("type","text").set("style",std::string("width: 450px; "))
+         << cgicc::input().set("type","text").set("style",std::string("width: 468px; margin-top: 1em; "))
       .set("value",textbox_default_value2)
       .set("name",textboxname2)
          << endl << cgicc::br() << endl
          << cgicc::textarea().set("style",
-                                  std::string("width: 500px; ")
+                                  std::string("width: 515px; ")
                                   + "margin-top: 1em; "
-                                  + "height: 10em; ")
+                                  + "height: 500px; ")
       .set("name", textboxname3)
          << textbox_default_value3
          << cgicc::textarea()
