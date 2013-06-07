@@ -56,25 +56,12 @@ namespace emu { namespace odmbdev {
        *
        ***********************************************************************/
 
-//        addActionByTypename<ReadBackUserCodes>(crate);
-//       addActionByTypename<SetComparatorThresholds>(crate);
-//       addActionByTypename<SetComparatorThresholdsBroadcast>(crate);
-//       addActionByTypename<SetUpComparatorPulse>(crate);
-//       addActionByTypename<SetUpPrecisionCapacitors>(crate);
-//       addActionByTypename<PulseInternalCapacitors>(crate);
-//       addActionByTypename<PulseInternalCapacitorsCCB>(crate);
-//       addActionByTypename<PulsePrecisionCapacitors>(crate);
-//       addActionByTypename<PulsePrecisionCapacitorsCCB>(crate);
-//       addActionByTypename<SetDMBDACs>(crate);
-//       addActionByTypename<ShiftBuckeyesNormRun>(crate);
-//       addActionByTypename<SetPipelineDepthAllDCFEBs>(crate);
-//       addActionByTypename<SetFineDelayForADCFEB>(crate);
-//       addActionByTypename<TMBHardResetTest>(crate);
-//       addActionByTypename<DDUReadKillFiber>(crate);
-//       addActionByTypename<DDUWriteKillFiber>(crate);
+//       addActionByTypename<ReadBackUserCodes>(crate);
       cout<<"Adding button"<<endl;
       addActionByTypename<ExecuteVMEDSL>(crate);
-
+      cout << "Adding test reset button" << endl;
+      addActionByTypename<ResetRegisters>(crate);
+      
       /************************************************************************
        * Log Buttons
        *
@@ -126,63 +113,67 @@ namespace emu { namespace odmbdev {
            << body().set("style",
                          string("padding-bottom: 10em; ")
                          + "color: #333; ")
-           << h1()
+ 	   << cgicc::div().set("style",
+			       string("width: 500px;") +          
+			       "float: left")
+	   << h1()
            << "ODMB Test Routines - UCSB"
-           << h1();
-
+	   << h1();
+      
+      
       // Manuel: html object to browse local drive
       //*out<<endl<<"Select file with VME commands: <input type=file name=VMEfile  size=50 />"<<endl;
-
+      
       // begin: floating right hand side box
-//       *out << cgicc::div().set("style",
-//                                string("position:fixed;") +
-//                                "float:right;" +
-//                                "border: #000 solid 1px;" +
-//                                "top: 1em;" +
-//                                "right: 1em;" +
-//                                "padding: 1em;" +
-//                                "background-color: #eee")
-//            // the minimize button
-//            << cgicc::a().set("onclick", "toggleSidebox();")
-//                         .set("accesskey", "m")
-//                         .set("style",
-//                              string("position:absolute;") +
-//                              "float:right;" +
-//                              "border: #000 solid 1px;" +
-//                              "top: 0.5em;" +
-//                              "right: 0.5em;" +
-//                              "background-color: #222;" +
-//                              "color: #eee;" +
-//                              "font-weight: bold;" +
-//                              "text-decoration: none;")
-//            << "&mdash;"
-//            << cgicc::a()
-//            << h3().set("class", "sidebox") << "Common Utilities" << h3();
-
+      //       *out << cgicc::div().set("style",
+      //                                string("position:fixed;") +
+      //                                "float:right;" +
+      //                                "border: #000 solid 1px;" +
+      //                                "top: 1em;" +
+      //                                "right: 1em;" +
+      //                                "padding: 1em;" +
+      //                                "background-color: #eee")
+      //            // the minimize button
+      //            << cgicc::a().set("onclick", "toggleSidebox();")
+      //                         .set("accesskey", "m")
+      //                         .set("style",
+      //                              string("position:absolute;") +
+      //                              "float:right;" +
+      //                              "border: #000 solid 1px;" +
+      //                              "top: 0.5em;" +
+      //                              "right: 0.5em;" +
+      //                              "background-color: #222;" +
+      //                              "color: #eee;" +
+      //                              "font-weight: bold;" +
+      //                              "text-decoration: none;")
+      //            << "&mdash;"
+      //            << cgicc::a()
+      //            << h3().set("class", "sidebox") << "Common Utilities" << h3();
+      
       // this is only for common actions which we always want visible
       for(unsigned int i = 0; i < commonActions.size(); ++i) {
         // this multi-line statement sets up a form for the action,
         // which will create buttons, etc. The __action_to_call hidden
         // form element tells the Manager which action to use when
         // this form is submitted.
-        *out << p()
-             << cgicc::form().set("class", "sidebox")
-                             .set("method","GET")
-                             .set("action", "commonActions")
-             << cgicc::input().set("type","hidden")
-                              .set("value",numberToString(i))
-                              .set("name","__action_to_call")
-             << endl;
-
+	//        *out << p()
+	//             << cgicc::form().set("class", "sidebox")
+	//                             .set("method","GET")
+	//                             .set("action", "commonActions")
+	//             << cgicc::input().set("type","hidden")
+	//                              .set("value",numberToString(i))
+	//                              .set("name","__action_to_call")
+	//             << endl;
+	
         commonActions[i]->display(out);
-
+	
         // and here we close the form
         *out << cgicc::form()
              << p()
              << endl;
       }
 
-      *out << cgicc::div(); // end: floating right hand side box
+      //      *out << cgicc::div(); // end: floating right hand side box
 
       // most actions will appear here
       for(unsigned int i = 0; i < actions.size(); ++i) {
@@ -206,13 +197,15 @@ namespace emu { namespace odmbdev {
              << endl;
       }
 
-      *out //<< cgicc::div().set("style", string("border: #000 solid 1px;") + "padding: 1em;")
-           << h3() << "Output Log" << h3();
+      *out << cgicc::div();
+
+      *out << cgicc::div().set("style", string("width: 50%;") + "float:left;" + "padding-left: 30px;");
 
       for(unsigned int i = 0; i < logActions.size(); ++i) { // display log buttons at the top
         *out << p()
 	     << cgicc::form().set("method","GET")
 	  .set("action", "logActions")
+	     << "Output log " 
              << cgicc::input().set("type","hidden")
 	  .set("value",numberToString(i))
 	  .set("name","__action_to_call");

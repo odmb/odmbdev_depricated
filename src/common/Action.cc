@@ -172,6 +172,41 @@ namespace emu { namespace odmbdev {
                                            const string textboxname3,
                                            const string textbox_default_value3)
     throw (xgi::exception::Exception){
+    *out << cgicc::input().set("type","submit")
+      .set("value",button_name)
+         << endl  
+	 << cgicc::input().set("type","text").set("style",std::string("width: 40px; "))
+      .set("value",textbox_default_value1)
+      .set("name",textboxname1) << " times" 
+	 << cgicc::br() << " File: "
+         << cgicc::input().set("type","text").set("style",std::string("width: 450px; "))
+      .set("value",textbox_default_value2)
+      .set("name",textboxname2)
+         << endl << cgicc::br() << endl
+         << cgicc::textarea().set("style",
+                                  std::string("width: 500px; ")
+                                  + "margin-top: 1em; "
+                                  + "height: 10em; ")
+      .set("name", textboxname3)
+         << textbox_default_value3
+         << cgicc::textarea()
+	 << endl;
+    //         << cgicc::div();
+  }
+  
+  // static void AddButtonWithFileUpload(xgi::Output *out,
+  //                                     const string button_name)
+  //     throw (xgi::exception::Exception)
+  // {
+  //     *out << "<form method=\"post\" action=\""
+  //          << 
+  // }
+} // end namespace odmbdev
+} // end namespace emu
+
+/* Tom is going to be fucking with this code.  Here's the working version:
+
+    throw (xgi::exception::Exception){
     *out << cgicc::div().set("style",
                              std::string("border: #000 solid 1px; ")
                              + "padding: 1em; ")
@@ -187,7 +222,7 @@ namespace emu { namespace odmbdev {
       .set("name",textboxname2)
          << endl << cgicc::br() << endl
          << cgicc::textarea().set("style",
-                                  std::string("width: 100%; ")
+                                  std::string("width: 500px; ")
                                   + "margin-top: 1em; "
                                   + "height: 10em; ")
       .set("name", textboxname3)
@@ -195,13 +230,4 @@ namespace emu { namespace odmbdev {
          << cgicc::textarea()
          << cgicc::div();
   }
-  
-  // static void AddButtonWithFileUpload(xgi::Output *out,
-  //                                     const string button_name)
-  //     throw (xgi::exception::Exception)
-  // {
-  //     *out << "<form method=\"post\" action=\""
-  //          << 
-  // }
-} // end namespace odmbdev
-} // end namespace emu
+*/

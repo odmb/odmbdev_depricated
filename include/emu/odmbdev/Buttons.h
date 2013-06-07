@@ -108,111 +108,6 @@ namespace emu { namespace odmbdev {
       void respond(xgi::Input * in, ostringstream & out);
     };
 
-    class SetComparatorThresholds : public Action {
-    public:
-      SetComparatorThresholds(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class SetComparatorThresholdsBroadcast : public Action {
-    public:
-      SetComparatorThresholdsBroadcast(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class SetUpComparatorPulse : public Action {
-    public:
-      SetUpComparatorPulse(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class SetUpPrecisionCapacitors : public Action {
-    public:
-      SetUpPrecisionCapacitors(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class PulseInternalCapacitors : public Action {
-    public:
-      PulseInternalCapacitors(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class PulseInternalCapacitorsCCB : public Action {
-    public:
-      PulseInternalCapacitorsCCB(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class PulsePrecisionCapacitors : public Action {
-    public:
-      PulsePrecisionCapacitors(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class PulsePrecisionCapacitorsCCB : public Action {
-    public:
-      PulsePrecisionCapacitorsCCB(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class SetDMBDACs : public Action {
-    public:
-      SetDMBDACs(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class ShiftBuckeyesNormRun : public Action {
-    public:
-      ShiftBuckeyesNormRun(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class SetPipelineDepthAllDCFEBs : public Action {
-    public:
-      SetPipelineDepthAllDCFEBs(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class SetFineDelayForADCFEB : public Action {
-    public:
-      SetFineDelayForADCFEB(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class TMBHardResetTest : public Action {
-    public:
-      TMBHardResetTest(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class DDUReadKillFiber : public Action {
-    public:
-      DDUReadKillFiber(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
-    class DDUWriteKillFiber : public Action {
-    public:
-      DDUWriteKillFiber(Crate * crate);
-      void display(xgi::Output * out);
-      void respond(xgi::Input * in, ostringstream & out);
-    };
-
     /**************************************************************************
      * ExecuteVMEDSL
      *
@@ -224,6 +119,16 @@ namespace emu { namespace odmbdev {
       void respond(xgi::Input * in, ostringstream & out);
       int nCommand;
     };
+    /**************************************************************************
+     * ResetRegisters
+     *
+     * A small class to implement a reset from the ODMB_CTRL bits
+     **************************************************************************/
+    class ResetRegisters : public ButtonAction {
+    public:
+      ResetRegisters(Crate * crate);
+      void respond(xgi::Input * in, ostringstream & out);
+    };      
   }
 }
 

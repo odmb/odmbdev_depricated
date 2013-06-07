@@ -1,0 +1,16 @@
+======================================================================
+=                                                                    =
+=  ODMBDEV Software: Testing software for THE ODMB                   =
+=                                                                    =
+=  AUTHORS: Guido Magazzu, Frank Golf, Manuel Franco Sevilla,        =
+=           Tom Danielson, Jack Bradmiller-Feld, Adam Dishaw,        =
+=           Kristen Flowers, Alex George                             =
+=                                                                    =
+======================================================================
+
+V00-00: 6 June, 2013 Tom
+--------------------------------
+First commit of testing software.  Hope you like it.
+Added button to reset ODMB.
+Changed page layout.
+Code cleanup.
