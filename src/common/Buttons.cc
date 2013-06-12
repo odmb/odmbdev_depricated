@@ -16,9 +16,10 @@
 namespace emu { 
   namespace odmbdev {
 
-    string FixLength(unsigned int Number, int Length){
+    string FixLength(unsigned int Number, int Length, bool isHex){
       std::stringstream Stream;
-      Stream << std::hex << Number;
+      if(isHex) Stream << std::hex << Number;
+      else Stream << std::dec << Number;
       string sNumber = Stream.str();
       for(int cha=0; cha<sNumber.size(); cha++) sNumber[cha] = toupper(sNumber[cha]);
       while(sNumber.size() < Length) sNumber = " " + sNumber;
@@ -177,6 +178,7 @@ namespace emu {
 	  allLines.push_back(line);
 	}
       }
+      bool writeHex = true;
 
       for(unsigned int repNum=0; repNum<repeatNumber; ++repNum){
 	unsigned int loopLevel(0);
@@ -198,7 +200,7 @@ namespace emu {
 	  // >3 : Produces a sleep for that number of microseconds
 	  // 
 	  // <0 : Send an error message to the output and abort further execution.
-	  if(line.size()>3) iss >> buffer;
+	  if(line.size()>1) iss >> buffer;
 	  else buffer = "#";  // This avoids problems when the line is too short
 	  if(buffer=="0")  {
 	    out<<"Found EOR, exiting."<<endl;
@@ -235,13 +237,17 @@ namespace emu {
 	    //	    out << "data = " << hex << data << endl;
 	    irdwr = 2; TypeCommand = 2;
 	  } else if(buffer=="3" || buffer=="w" || buffer=="W") { // Write in hex
-	    iss >> hex >> addr >> hex >> data;	
+	    iss >> hex >> addr;	
+	    if(addr >= 0x4000 && addr <= 0x4018) {iss >> dec >> data; writeHex = false;}
+	    else iss >> hex >> data;
 	    irdwr = 3; TypeCommand = 3;
 	  } else if(buffer=="4" || buffer=="rs" || buffer=="RS") { // Read in hex with slot
 	    iss >> hex >> addr >> hex >> data >> dec >> slot;	
 	    irdwr = 2; TypeCommand = 4;
 	  } else if(buffer=="5" || buffer=="ws" || buffer=="WS") { // Write in hex with slot
-	    iss >> hex >> addr >> hex >> data >> dec >> slot;	
+	    iss >> hex >> addr;	
+	    if(addr >= 0x4000 && addr <= 0x4018) {iss >> dec >> data >> dec >> slot; writeHex = false;}	
+	    else iss >> hex >> data >> dec >> slot;
 	    irdwr = 3; TypeCommand = 5;
 	  } else if(buffer=="6" || buffer=="BL" || buffer=="bl") {
 	    ++loopLevel;
@@ -266,6 +272,9 @@ namespace emu {
 	    iss >> sleepTimer;
 	    usleep(sleepTimer);
 	    continue; // Nothing else to do from this line.
+	  } else if(buffer=="rl1a" || buffer=="RL1A") {
+	    TypeCommand = 9;
+	    iss >> sleepTimer;
 	  } else { // Anything else is treated as a comment.
 	    out  << line << endl;
 	    logfile << "# " << line << endl;
@@ -301,34 +310,67 @@ namespace emu {
 	  if(TypeCommand>0){
 	    // Set the top bits of address to the slot number
 	    unsigned int shiftedSlot = slot << 19;
-	    addr = (addr & 0x07ffff) | shiftedSlot;
+	    int nDigits = 5;
+	    if(TypeCommand != 9){
+	      addr = (addr & 0x07ffff) | shiftedSlot;	    
+	      printf("Calling:  vme_controller(%d,%06x,&%04x,{%02x,%02x})  ", irdwr, 
+		     (addr & 0xffffff), (data & 0xffff), (rcv[0] & 0xff), (rcv[1] & 0xff));
+	      crate->vmeController()->vme_controller(irdwr, addr, &data, rcv); // Send the VME command!
+	      usleep(1);
 	    
-	    printf("Calling:  vme_controller(%d,%06x,&%04x,{%02x,%02x})  ", irdwr, 
-		   (addr & 0xffffff), (data & 0xffff), (rcv[0] & 0xff), (rcv[1] & 0xff));
-	    crate->vmeController()->vme_controller(irdwr, addr, &data, rcv); // Send the VME command!
-	    // VMEController::print_decoded_vme_address(addr, &data);
-	    usleep(1);
-	    
-	    // If it was a read, then show the result
-	    if(irdwr==2) printf("  ==> rcv[1,0] = %02x %02x", (rcv[1] & 0xff), (rcv[0] & 0xff));
-	    printf("\n");
-	    fflush(stdout);
+	      // If it was a read, then show the result
+	      if(irdwr==2) printf("  ==> rcv[1,0] = %02x %02x", (rcv[1] & 0xff), (rcv[0] & 0xff));
+	      printf("\n");
+	      fflush(stdout);
 	    
 	    
-	    // Output to website
-	    addr = (addr & 0x07ffff);
-	    unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
-	    switch (irdwr) {
-	    case 2:
-	      out << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult)  << "    "<<comments<<endl;
-	      logfile << "RS  " << FixLength(addr) << "        "  << FixLength(VMEresult)  << "    "
-		      << timestamp << "\t" << comments<<endl;
-	      break;
-	    case 3:
-	      out << "W  " << FixLength(addr) << "  " << FixLength(data) <<  "          "<<comments<<endl;
-	      logfile << "WS  " << FixLength(addr) << "  " << FixLength(data) <<  "          "
-		      << timestamp << "\t" << comments<<endl;
-	      break;
+	      // Output to website
+	      addr = (addr & 0x07ffff);  // Masks out the slot number
+	      unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
+	      bool readHex = true;
+	      if((addr >= 0x321C && addr <= 0x337C) || (addr >= 0x33FC && addr <= 0x359C) ||
+	       (addr >= 0x4400 && addr <= 0x4418) || addr == 0x500C || addr == 0x8004 || 
+		 (addr == 0x5000 && VMEresult < 0x1000)) readHex = false;
+	      switch (irdwr) {
+	      case 2:
+		out << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult, nDigits, readHex)  << "    "<<comments<<endl;
+		logfile << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult, nDigits, readHex)  << "    "
+			<< timestamp << "\t" << comments<<endl;
+		break;
+	      case 3:
+		out << "W  " << FixLength(addr) << "  " << FixLength(data, nDigits, writeHex) <<  "          "<<comments<<endl;
+		logfile << "W  " << FixLength(addr) << "  " << FixLength(data, nDigits, writeHex) <<  "          "
+			<< timestamp << "\t" << comments<<endl;
+		break;
+	    }
+	    } else {
+	      unsigned int read_fifo = 0x005000;
+	      unsigned int reset_fifo = 0x005020;
+	      // Set the top bits of address to the slot number
+	      read_fifo = (read_fifo & 0x07ffff) | shiftedSlot;
+	      reset_fifo = (reset_fifo & 0x07ffff) | shiftedSlot;
+ 	      crate->vmeController()->vme_controller(2, read_fifo, &data, rcv); // Send the VME command!
+	      unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
+	      usleep(1);
+	      long msb = VMEresult << 12;
+
+ 	      crate->vmeController()->vme_controller(2, read_fifo, &data, rcv); // Send the VME command!
+	      VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
+	      usleep(1);
+	      int lsb = VMEresult;
+	      data = 0xff;
+ 	      crate->vmeController()->vme_controller(3, reset_fifo, &data, rcv); // Send the VME command!
+	      usleep(1);
+	      long l1a_cnt = msb+lsb;
+	      if(msb < 0x1000 || lsb < 0x1000){
+		out << "RL1A            "  << FixLength(l1a_cnt, nDigits, false)  << "    "<<comments<<endl;
+		logfile << "RL1A            "  << FixLength(l1a_cnt, nDigits, false)  << "    "
+			<< timestamp << "\t" << comments<<endl;
+	      } else {
+		out << "RL1A             XXXX"  << "    "<<"No good DCFEB L1A_CNT read"<<endl;
+		logfile << "RL1A             XXXX"  << "    "<< timestamp << "\t" <<"No good DCFEB L1A_CNT read"<<endl;
+	      }
+
 	    }
 	  }
 	} // while parsing lines

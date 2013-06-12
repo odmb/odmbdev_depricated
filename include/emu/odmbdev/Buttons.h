@@ -53,7 +53,7 @@ namespace emu { namespace odmbdev {
      * Simple functions
      *************************************************************************/
 
-    string FixLength(unsigned int Number, int Length = 5);
+    string FixLength(unsigned int Number, int Length = 5, bool isHex = true);
     
 
     /**************************************************************************
