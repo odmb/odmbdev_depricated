@@ -8,6 +8,11 @@
 =                                                                    =
 ======================================================================
 
+V00-01: 27 June, 2013 Manuel
+--------------------------------
+Made some outputs decimal.
+Added SLEEP and RL1A commands.
+
 V00-00: 6 June, 2013 Tom
 --------------------------------
 First commit of testing software.  Hope you like it.
