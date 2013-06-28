@@ -328,9 +328,9 @@ namespace emu {
 	      addr = (addr & 0x07ffff);  // Masks out the slot number
 	      unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
 	      bool readHex = true;
-	      if((addr >= 0x321C && addr <= 0x337C) || (addr >= 0x33FC && addr <= 0x359C) ||
-	       (addr >= 0x4400 && addr <= 0x4418) || addr == 0x500C || addr == 0x8004 || 
-		 (addr == 0x5000 && VMEresult < 0x1000)) readHex = false;
+	      if((addr >= 0x321C && addr <= 0x337C) || (addr >= 0x33FC && addr <= 0x367C) ||
+	       (addr >= 0x4400 && addr <= 0x4418) || addr == 0x500C || addr == 0x510C || addr == 0x530C || addr == 0x540C 
+		 || addr == 0x8004 ||  (addr == 0x5000 && VMEresult < 0x1000)) readHex = false;
 	      switch (irdwr) {
 	      case 2:
 		out << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult, nDigits, readHex)  << "    "<<comments<<endl;
