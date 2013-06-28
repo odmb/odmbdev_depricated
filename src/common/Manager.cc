@@ -61,6 +61,8 @@ namespace emu { namespace odmbdev {
       addActionByTypename<ExecuteVMEDSL>(crate);
       cout << "Adding test reset button" << endl;
       addActionByTypename<ResetRegisters>(crate);
+      cout << "Adding reprogram DCFEB button" << endl;
+      addActionByTypename<ReprogramDCFEB>(crate);
       
       /************************************************************************
        * Log Buttons

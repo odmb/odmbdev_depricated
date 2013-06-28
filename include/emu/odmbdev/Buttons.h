@@ -129,6 +129,16 @@ namespace emu { namespace odmbdev {
       ResetRegisters(Crate * crate);
       void respond(xgi::Input * in, ostringstream & out);
     };      
+    /**************************************************************************
+     * ResetRegisters
+     *
+     * A small class to reprogram the DCFEB
+     **************************************************************************/
+    class ReprogramDCFEB : public ButtonAction {
+    public:
+      ReprogramDCFEB(Crate * crate);
+      void respond(xgi::Input * in, ostringstream & out);
+    };      
   }
 }
 

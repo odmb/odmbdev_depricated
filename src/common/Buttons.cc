@@ -81,6 +81,39 @@ namespace emu {
       out << "R  " << FixLength(read_addr & 0xffff) << "        " << FixLength(VMEresult)  << endl;      
       
     }
+
+    /**************************************************************************
+     * ResetRegisters
+     *
+     * A small class to implement a reset from the ODMB_CTRL bits --TD
+     **************************************************************************/
+    ReprogramDCFEB::ReprogramDCFEB(Crate * crate) 
+      : ButtonAction(crate,"Reprogram DCFEB") 
+    { /* The choices here are really a blank constructor vs duplicating the ExecuteVMEDSL constructor.
+	 I've tried the former -- TD
+       */
+    }
+    
+    void ReprogramDCFEB::respond(xgi::Input * in, ostringstream & out) { // TD
+      out << "********** VME REGISTER RESET **********" << endl;
+      bool debug = false;
+      int slot = 15;
+      unsigned int shiftedSlot = slot << 19;
+      char rcv[2];
+      // These are the appropriate R/W addresses for register reset
+      unsigned int write_addr = 0x003010;
+      // Set the top bits of address to the slot number
+      write_addr = (write_addr & 0x07ffff) | shiftedSlot;
+      unsigned short int reset_command = 0x1;
+      unsigned short int data;
+      //if (debug) out << "data initialized to " << hex << data << endl;
+      
+      crate->vmeController()->vme_controller(3,write_addr,&reset_command,rcv);
+      usleep(100);      
+
+      out << "W   3010      1          Reprogram all DCFEBs" << endl;      
+      
+    }
     
     /**************************************************************************
      * ExecuteVMEDSL
