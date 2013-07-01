@@ -8,6 +8,10 @@
 =                                                                    =
 ======================================================================
 
+V00-02: 1 July, 2013 Manuel
+--------------------------------
+Added button to reprogram DCFEBs and L1AM command.
+
 V00-01: 27 June, 2013 Manuel
 --------------------------------
 Made some outputs decimal.
