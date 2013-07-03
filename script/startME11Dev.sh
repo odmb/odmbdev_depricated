@@ -62,7 +62,7 @@ print
 
 OPTIONS="\
  -h wimp.physics.ucsb.edu \
- -p 20011 \
+ -p 9999 \
  -c ${BUILD_HOME}/emu/odmbdev/xml/EmuME11Dev.xml \
  -e ${BUILD_HOME}/emu/odmbdev/xml/EmuME11Dev.profile"
 

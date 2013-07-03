@@ -35,7 +35,7 @@ namespace emu {
       : ButtonAction(crate,"Reset ODMB registers/FIFOs") 
     { /* The choices here are really a blank constructor vs duplicating the ExecuteVMEDSL constructor.
 	 I've tried the former -- TD
-       */
+      */
     }
     
     void ResetRegisters::respond(xgi::Input * in, ostringstream & out) { // TD
@@ -91,7 +91,7 @@ namespace emu {
       : ButtonAction(crate,"Reprogram DCFEB") 
     { /* The choices here are really a blank constructor vs duplicating the ExecuteVMEDSL constructor.
 	 I've tried the former -- TD
-       */
+      */
     }
     
     void ReprogramDCFEB::respond(xgi::Input * in, ostringstream & out) { // TD
@@ -173,11 +173,11 @@ namespace emu {
       logfile.open( outputfilename, ios::app );
       if( writeheader!=0 ) logfile << "# R/W\tCommand\tData\tSlot\tTime\t\tComments" << endl;
 
-	  ////////////////////////////////////////////////////// 
-	  istringstream countertext(this->textBoxContent1); //read the number of times to repeat commands and possibly a file containing commands  
+      ////////////////////////////////////////////////////// 
+      istringstream countertext(this->textBoxContent1); //read the number of times to repeat commands and possibly a file containing commands  
       istringstream filetext(this->textBoxContent2); // input a file path to the wimp page, read commands from the file
       bool textFileMode(false); // Option to input a text file from the second box on WIMP
-      							// works with file in current directory or full path - JB-F
+      // works with file in current directory or full path - JB-F
       string filePath, fileContents, file_line;
       if (filetext.str().size()) { // If you specify a file path on the WIMP page, then we feed it into the string "fileContents" - JB-F
       	textFileMode = true;
@@ -191,9 +191,9 @@ namespace emu {
     	fileFromWIMP.close();
       }
       istringstream alltext; // where the input commands will go
-	  if (textFileMode) {
-	   cout << "Reading from file: " << filePath << endl;
-	   alltext.str(fileContents); // assigns content of text file to alltext, after you push "Execute VME DSL Program" - JB-F
+      if (textFileMode) {
+	cout << "Reading from file: " << filePath << endl;
+	alltext.str(fileContents); // assigns content of text file to alltext, after you push "Execute VME DSL Program" - JB-F
       }
       else {
       	cout << "Reading from textbox." << endl;
@@ -204,7 +204,7 @@ namespace emu {
       const unsigned long repeatNumber=strtoul(line.c_str(),NULL,0);
       std::vector<std::string> allLines(0);
       while (getline(alltext,line,'\n')){
-	if(1){//line.size()){//Discard empty lines                                                                                                                                   
+	if(1){//line.size()){//Discard empty lines
 	  allLines.push_back(line);
 	}
       }
@@ -234,7 +234,7 @@ namespace emu {
 	  else buffer = "#";  // This avoids problems when the line is too short
 	  if(buffer=="0")  {
 	    out<<"Found EOR, exiting."<<endl;
-	    return; // EOR instruction
+	    break;// EOR instruction
 	  } else if(buffer=="1") { // Expect 32 bits for address and 32 bits for data
 	    string addr_str, data_str, tmp_str;
 	    //	    out << "data from string: " << hex << data << endl;
@@ -362,7 +362,7 @@ namespace emu {
 	      unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
 	      bool readHex = true;
 	      if((addr >= 0x321C && addr <= 0x337C) || (addr >= 0x33FC && addr <= 0x367C) ||
-	       (addr >= 0x4400 && addr <= 0x4418) 
+		 (addr >= 0x4400 && addr <= 0x4418) 
 		 || addr == 0x500C || addr == 0x510C || addr == 0x520C || addr == 0x530C || addr == 0x540C 
 		 || addr == 0x8004 ||  (addr == 0x5000 && VMEresult < 0x1000)) readHex = false;
 	      switch (irdwr) {
@@ -376,7 +376,7 @@ namespace emu {
 		logfile << "W  " << FixLength(addr) << "  " << FixLength(data, nDigits, writeHex) <<  "          "
 			<< timestamp << "\t" << comments<<endl;
 		break;
-	    }
+	      }
 	    } else {
 	      unsigned int read_fifo = 0x005000;
 	      unsigned int reset_fifo = 0x005020;
