@@ -16,14 +16,29 @@
 namespace emu { 
   namespace odmbdev {
 
-    string FixLength(unsigned int Number, int Length, bool isHex){
+    std::string ToUpper(std::string s){
+      for(unsigned int i(0); i<s.length(); ++i){
+	s.at(i)=toupper(s.at(i));
+      }
+      return s;
+    }
+
+    string FixLength(unsigned int Number, unsigned int Length, bool isHex){
       std::stringstream Stream;
       if(isHex) Stream << std::hex << Number;
       else Stream << std::dec << Number;
       string sNumber = Stream.str();
-      for(int cha=0; cha<sNumber.size(); cha++) sNumber[cha] = toupper(sNumber[cha]);
+      for(unsigned int cha=0; cha<sNumber.size(); cha++) sNumber[cha] = toupper(sNumber[cha]);
       while(sNumber.size() < Length) sNumber = " " + sNumber;
       return sNumber;
+    }
+
+    unsigned short CountSetBits(unsigned short x){
+      unsigned short count(0);
+      for(count =0; x; count++){
+	x &= x-1;
+      }
+      return count;
     }
 
     /**************************************************************************
@@ -88,7 +103,7 @@ namespace emu {
      * A small class to implement a reset from the ODMB_CTRL bits --TD
      **************************************************************************/
     ReprogramDCFEB::ReprogramDCFEB(Crate * crate) 
-      : ButtonAction(crate,"Reprogram DCFEB") 
+      : ButtonAction(crate,"Reprogram DCFEBs") 
     { /* The choices here are really a blank constructor vs duplicating the ExecuteVMEDSL constructor.
 	 I've tried the former -- TD
       */
@@ -137,6 +152,7 @@ namespace emu {
       //// the arguments for vme_controller ////
       char rcv[2];
       unsigned int sleepTimer;
+      unsigned int testReps(0);
       unsigned int addr;
       unsigned short int data;
       //      out << "data initialized to " << hex << data << endl;
@@ -192,11 +208,8 @@ namespace emu {
       }
       istringstream alltext; // where the input commands will go
       if (textFileMode) {
-	cout << "Reading from file: " << filePath << endl;
 	alltext.str(fileContents); // assigns content of text file to alltext, after you push "Execute VME DSL Program" - JB-F
-      }
-      else {
-      	cout << "Reading from textbox." << endl;
+      } else {
       	alltext.str(this->textBoxContent3); // get the text from the box                                                                                                      
       }
       string line, buffer;
@@ -215,7 +228,7 @@ namespace emu {
 	std::vector<unsigned int> loopCounter(0), loopMax(0), loopStart(0);
 	for(unsigned int lineNum=0; lineNum<allLines.size(); ++lineNum){
 	  line=allLines.at(lineNum);
-	  while(line[0]==' ' || line[0]=='\t') line.erase(0,1);
+	  while(line.length()>0 && (line.at(0)==' ' || line.at(0)=='\t')) line.erase(0,1);
 	  istringstream iss(line);
 
 	  // 0 :       End of run, stop execution
@@ -232,6 +245,7 @@ namespace emu {
 	  // <0 : Send an error message to the output and abort further execution.
 	  if(line.size()>1) iss >> buffer;
 	  else buffer = "#";  // This avoids problems when the line is too short
+	  buffer=ToUpper(buffer);
 	  if(buffer=="0")  {
 	    out<<"Found EOR, exiting."<<endl;
 	    break;// EOR instruction
@@ -261,25 +275,25 @@ namespace emu {
 	    data = BinaryString_to_UInt(data_str);
 	    //	    out << "data = " << data << endl;
 	    TypeCommand = irdwr;
-	  } else if(buffer=="2" || buffer=="r" || buffer=="R") { // Read in hex
+	  } else if(buffer=="2" || buffer=="R") { // Read in hex
 	    //	    out << "data = " << hex << data << endl;
 	    iss >> hex >> addr >> hex >> data;	
 	    //	    out << "data = " << hex << data << endl;
 	    irdwr = 2; TypeCommand = 2;
-	  } else if(buffer=="3" || buffer=="w" || buffer=="W") { // Write in hex
+	  } else if(buffer=="3" || buffer=="W") { // Write in hex
 	    iss >> hex >> addr;	
 	    if(addr >= 0x4000 && addr <= 0x4018) {iss >> dec >> data; writeHex = false;}
 	    else {iss >> hex >> data; writeHex = true;}
 	    irdwr = 3; TypeCommand = 3;
-	  } else if(buffer=="4" || buffer=="rs" || buffer=="RS") { // Read in hex with slot
+	  } else if(buffer=="4" || buffer=="RS") { // Read in hex with slot
 	    iss >> hex >> addr >> hex >> data >> dec >> slot;	
 	    irdwr = 2; TypeCommand = 4;
-	  } else if(buffer=="5" || buffer=="ws" || buffer=="WS") { // Write in hex with slot
+	  } else if(buffer=="5" || buffer=="WS") { // Write in hex with slot
 	    iss >> hex >> addr;	
 	    if(addr >= 0x4000 && addr <= 0x4018) {iss >> dec >> data >> dec >> slot; writeHex = false;}	
 	    else {iss >> hex >> data >> dec >> slot; writeHex = true;}
 	    irdwr = 3; TypeCommand = 5;
-	  } else if(buffer=="6" || buffer=="BL" || buffer=="bl") {
+	  } else if(buffer=="6" || buffer=="BL") {
 	    ++loopLevel;
 	    loopCounter.push_back(1);
 	    int thisLoopMax(0);
@@ -287,7 +301,7 @@ namespace emu {
 	    loopMax.push_back(thisLoopMax);
 	    loopStart.push_back(lineNum);
 	    irdwr = -1; TypeCommand= -1; //Negative; do not send to VME - AD
-	  } else if(buffer=="7" || buffer=="EL" || buffer=="el") {
+	  } else if(buffer=="7" || buffer=="EL") {
 	    if(loopCounter.at(loopLevel-1)<loopMax.at(loopLevel-1)){
 	      lineNum=loopStart.at(loopLevel-1);
 	      ++loopCounter.at(loopLevel-1);
@@ -298,16 +312,22 @@ namespace emu {
 	      --loopLevel;
 	    }
 	    irdwr = -1; TypeCommand = -1; //Negative; do not send to VME - AD
-	  } else if(buffer=="8" || buffer=="sleep" || buffer=="SLEEP" || buffer=="wait" || buffer=="WAIT") {
+	  } else if(buffer=="8" || buffer=="SLEEP" || buffer=="WAIT") {
 	    iss >> sleepTimer;
 	    usleep(sleepTimer);
 	    continue; // Nothing else to do from this line.
-	  } else if(buffer=="rl1a" || buffer=="RL1A") {
+	  } else if(buffer=="RL1A") {
 	    TypeCommand = 9;
 	    iss >> sleepTimer;
-	  } else if(buffer=="rl1am" || buffer=="RL1AM") {
+	  } else if(buffer=="RL1AM") {
 	    TypeCommand = 10;
 	    iss >> sleepTimer;
+	  } else if(buffer=="COMP_DDU") {
+	    TypeCommand = 11;
+	    iss >> testReps;
+	  } else if(buffer=="COMP_PC"){
+	    TypeCommand = 12;
+	    iss >> testReps;
 	  } else { // Anything else is treated as a comment.
 	    out  << line << endl;
 	    logfile << "# " << line << endl;
@@ -317,9 +337,9 @@ namespace emu {
 	  //// We are at the end of official commands, add the rest to comments - KF
 	  string comments;
 	  getline( iss, comments );
-	  while(comments[0]==' ' || comments[0]=='\t') comments.erase(0,1);
+	  while(comments.size()>0 && (comments.at(0)==' ' || comments.at(0)=='\t')) comments.erase(0,1);
 	  //// Output type of command is always W or R - KF
-	  //// Added command type L for loops - AD
+	  //// Added command types L for loops, T for tests - AD
 	  string commandtype;
 	  switch(irdwr){
 	  case 2:
@@ -331,6 +351,10 @@ namespace emu {
 	  case -1:
 	    commandtype="L";
 	    break;
+	  case 11:
+	  case 12:
+	    commandtype="T";
+	    break;
 	  default:
 	    commandtype="Error with command type!";
 	    break;
@@ -340,80 +364,111 @@ namespace emu {
 	  //Only if TypeCommand>0 due to addition of loop! - AD
 	  //printf("TypeCommand: %d\n", TypeCommand);
 	  //out << TypeCommand << endl;
-	  if(TypeCommand>0){
+
+	  // Set the top bits of address to the slot number
+	  unsigned int shiftedSlot = slot << 19;
+	  int nDigits = 5;
+	  if(TypeCommand>=2 && TypeCommand<=5){
+	    addr = (addr & 0x07ffff) | shiftedSlot;	    
+	    printf("Calling:  vme_controller(%d,%06x,&%04x,{%02x,%02x})  ", irdwr, 
+		   (addr & 0xffffff), (data & 0xffff), (rcv[0] & 0xff), (rcv[1] & 0xff));
+	    crate->vmeController()->vme_controller(irdwr, addr, &data, rcv); // Send the VME command!
+	    usleep(1);
+	    
+	    // If it was a read, then show the result
+	    if(irdwr==2) printf("  ==> rcv[1,0] = %02x %02x", (rcv[1] & 0xff), (rcv[0] & 0xff));
+	    printf("\n");
+	    fflush(stdout);
+	    
+	    
+	    // Output to website
+	    addr = (addr & 0x07ffff);  // Masks out the slot number
+	    unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
+	    bool readHex = true;
+	    if((addr >= 0x321C && addr <= 0x337C) || (addr >= 0x33FC && addr <= 0x367C) ||
+	       (addr >= 0x4400 && addr <= 0x4418) 
+	       || addr == 0x500C || addr == 0x510C || addr == 0x520C || addr == 0x530C || addr == 0x540C 
+	       || addr == 0x8004 ||  (addr == 0x5000 && VMEresult < 0x1000)) readHex = false;
+	    switch (irdwr) {
+	    case 2:
+	      out << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult, nDigits, readHex)  << "    "<<comments<<endl;
+	      logfile << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult, nDigits, readHex)  << "    "
+		      << timestamp << "\t" << comments<<endl;
+	      break;
+	    case 3:
+	      out << "W  " << FixLength(addr) << "  " << FixLength(data, nDigits, writeHex) <<  "          "<<comments<<endl;
+	      logfile << "W  " << FixLength(addr) << "  " << FixLength(data, nDigits, writeHex) <<  "          "
+		      << timestamp << "\t" << comments<<endl;
+	      break;
+	    }
+	  } else if (TypeCommand==9 || TypeCommand==10){
+	    unsigned int read_fifo = 0x005000;
+	    unsigned int reset_fifo = 0x005020;
 	    // Set the top bits of address to the slot number
-	    unsigned int shiftedSlot = slot << 19;
-	    int nDigits = 5;
-	    if(TypeCommand != 9 && TypeCommand != 10){
-	      addr = (addr & 0x07ffff) | shiftedSlot;	    
-	      printf("Calling:  vme_controller(%d,%06x,&%04x,{%02x,%02x})  ", irdwr, 
-		     (addr & 0xffffff), (data & 0xffff), (rcv[0] & 0xff), (rcv[1] & 0xff));
-	      crate->vmeController()->vme_controller(irdwr, addr, &data, rcv); // Send the VME command!
-	      usleep(1);
+	    read_fifo = (read_fifo & 0x07ffff) | shiftedSlot;
+	    reset_fifo = (reset_fifo & 0x07ffff) | shiftedSlot;
+	    crate->vmeController()->vme_controller(2, read_fifo, &data, rcv); // Read the 1st word for L1A_MATCH
+	    if(TypeCommand == 9) crate->vmeController()->vme_controller(2, read_fifo, &data, rcv); //2nd word for L1A
+	    unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
+	    usleep(1);
 	    
-	      // If it was a read, then show the result
-	      if(irdwr==2) printf("  ==> rcv[1,0] = %02x %02x", (rcv[1] & 0xff), (rcv[0] & 0xff));
-	      printf("\n");
-	      fflush(stdout);
-	    
-	    
-	      // Output to website
-	      addr = (addr & 0x07ffff);  // Masks out the slot number
-	      unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
-	      bool readHex = true;
-	      if((addr >= 0x321C && addr <= 0x337C) || (addr >= 0x33FC && addr <= 0x367C) ||
-		 (addr >= 0x4400 && addr <= 0x4418) 
-		 || addr == 0x500C || addr == 0x510C || addr == 0x520C || addr == 0x530C || addr == 0x540C 
-		 || addr == 0x8004 ||  (addr == 0x5000 && VMEresult < 0x1000)) readHex = false;
-	      switch (irdwr) {
-	      case 2:
-		out << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult, nDigits, readHex)  << "    "<<comments<<endl;
-		logfile << "R  " << FixLength(addr) << "        "  << FixLength(VMEresult, nDigits, readHex)  << "    "
-			<< timestamp << "\t" << comments<<endl;
-		break;
-	      case 3:
-		out << "W  " << FixLength(addr) << "  " << FixLength(data, nDigits, writeHex) <<  "          "<<comments<<endl;
-		logfile << "W  " << FixLength(addr) << "  " << FixLength(data, nDigits, writeHex) <<  "          "
-			<< timestamp << "\t" << comments<<endl;
-		break;
-	      }
+	    data = 0xff;
+	    crate->vmeController()->vme_controller(3, reset_fifo, &data, rcv); // Send the VME command!
+	    usleep(1);
+	    long l1a_cnt = VMEresult;
+	    string command = "RL1A ", l1a_comment = "L1A";
+	    if(TypeCommand == 10) {command = "RL1AM";l1a_comment = "L1A_MATCH";}
+	    if(l1a_cnt < 0x1000){
+	      out << command<<"           "  << FixLength(l1a_cnt, nDigits, false)  << "    "<<comments<<endl;
+	      logfile << command<< "           "  << FixLength(l1a_cnt, nDigits, false)  << "    "
+		      << timestamp << "\t" << comments<<endl;
 	    } else {
-	      unsigned int read_fifo = 0x005000;
-	      unsigned int reset_fifo = 0x005020;
-	      // Set the top bits of address to the slot number
-	      read_fifo = (read_fifo & 0x07ffff) | shiftedSlot;
-	      reset_fifo = (reset_fifo & 0x07ffff) | shiftedSlot;
- 	      crate->vmeController()->vme_controller(2, read_fifo, &data, rcv); // Read the 1st word for L1A_MATCH
-	      if(TypeCommand == 9) crate->vmeController()->vme_controller(2, read_fifo, &data, rcv); //2nd word for L1A
-	      unsigned int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
+	      out << command<< "            XXXX"  << "    "<<"No good DCFEB "<<l1a_comment<<"_CNT read"<<endl;
+	      logfile << command<< "            XXXX"  << "    "<< timestamp << "\t" <<"No good DCFEB "<<l1a_comment<<"_CNT read"<<endl;
+	    }
+	  }else if (TypeCommand==11 || TypeCommand==12){
+	    std::string testType = TypeCommand==11 ? "DDU" : "PC ";
+	    char rcv_tx[2], rcv_rx[2];
+	    unsigned short rcv_tx_i(0), rcv_rx_i(0), rcv_diff_i(0);
+	    unsigned long bitChanges(0), bitMatches(0);
+	    unsigned short arg(0);
+	    const unsigned int addr_tx = TypeCommand==11 ? (0x005300 & 0x07ffff) | shiftedSlot : (0x005100 & 0x07ffff) | shiftedSlot;
+	    const unsigned int addr_rx = TypeCommand==11 ? (0x005400 & 0x07ffff) | shiftedSlot : (0x005200 & 0x07ffff) | shiftedSlot;
+	    for(unsigned int j(0); j<testReps; ++j){
+	      crate->vmeController()->vme_controller(2, addr_tx, &arg, rcv_tx); //Read TX FIFO
 	      usleep(1);
-
-	      data = 0xff;
- 	      crate->vmeController()->vme_controller(3, reset_fifo, &data, rcv); // Send the VME command!
+	      crate->vmeController()->vme_controller(2, addr_rx, &arg, rcv_rx); //Read RX FIFO
 	      usleep(1);
-	      long l1a_cnt = VMEresult;
-	      string command = "RL1A ", l1a_comment = "L1A";
-	      if(TypeCommand == 10) {command = "RL1AM";l1a_comment = "L1A_MATCH";}
-	      if(l1a_cnt < 0x1000){
-		out << command<<"           "  << FixLength(l1a_cnt, nDigits, false)  << "    "<<comments<<endl;
-		logfile << command<< "           "  << FixLength(l1a_cnt, nDigits, false)  << "    "
-			<< timestamp << "\t" << comments<<endl;
-	      } else {
-		out << command<< "            XXXX"  << "    "<<"No good DCFEB "<<l1a_comment<<"_CNT read"<<endl;
-		logfile << command<< "            XXXX"  << "    "<< timestamp << "\t" <<"No good DCFEB "<<l1a_comment<<"_CNT read"<<endl;
-	      }
-
+	      
+	      //Combine into int
+	      rcv_tx_i=(rcv_tx[1]*0x100) + rcv_tx[0];
+	      rcv_rx_i=(rcv_rx[1]*0x100) + rcv_rx[0];
+	      
+	      //Compare FIFOs
+	      rcv_diff_i=rcv_tx_i^rcv_rx_i;
+	      
+	      //Count bits set to 1 (where differences occur)
+	      unsigned int setBits(CountSetBits(rcv_diff_i));
+	      bitChanges+=setBits;
+	      bitMatches+=16-setBits;
+	    }
+	    if(bitChanges){
+	      out << "COMP_" << testType << FixLength(testReps, nDigits+2, false) << FixLength(bitChanges, nDigits+1, false) << "    Bit changes = " << bitChanges << ", bit matches = " << bitMatches << std::endl;
+	      logfile << "COMP_" << testType << FixLength(testReps, nDigits+2, false) << FixLength(bitChanges, nDigits+1, false) << "    " << timestamp << "\tBit changes = " << bitChanges << ", bit matches = " << bitMatches << std::endl;
+	    }else{
+	      out << "COMP_" << testType << FixLength(testReps, nDigits+2, false) << FixLength(bitChanges, nDigits+1, false) << "    All " << bitMatches << " bits match" << std::endl;
+	      logfile << "COMP_" << testType << FixLength(testReps, nDigits+2, false) << FixLength(bitChanges, nDigits+1, false) << "    " << timestamp << "\tAll " << bitMatches << " bits match" << std::endl;
 	    }
 	  }
 	} // while parsing lines
 	out<<endl;
       }
-
+      
       //// close the logfile -KF
       logfile.close();
-
+      
     } // End ExecuteVMEDSL::respond
-
+    
     
 
     //    /**************************************************************************

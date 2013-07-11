@@ -5,7 +5,7 @@
     xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
     xmlns:xc="http://xdaq.web.cern.ch/xdaq/xsd/2004/XMLConfiguration-30">
 
-  <xc:Context url="http://wimp.physics.ucsb.edu:9999">
+  <xc:Context url="http://wimp.physics.ucsb.edu:20011">
 
     <xc:Module>${XDAQ_ROOT}/lib/libxalan-c.so</xc:Module>
     <xc:Module>${XDAQ_ROOT}/lib/libtstoreclient.so</xc:Module>

@@ -53,7 +53,9 @@ namespace emu { namespace odmbdev {
      * Simple functions
      *************************************************************************/
 
-    string FixLength(unsigned int Number, int Length = 5, bool isHex = true);
+    string FixLength(unsigned int Number, unsigned int Length = 5, bool isHex = true);
+    unsigned short CountSetBits(const unsigned short);
+    std::string ToUpper(std::string);
     
 
     /**************************************************************************
