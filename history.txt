@@ -8,13 +8,17 @@
 =                                                                    =
 ======================================================================
 
-V00-03: 11 July, 2013 Adam
+V00-04: 11 July, 2013 Adam
 --------------------------------
 Added commands to high stats testing of DDU and PC optical transmission
 
-V00-02: 1 July, 2013 Manuel
+V00-03: 1 July, 2013 Manuel
 --------------------------------
 Added button to reprogram DCFEBs and L1AM command.
+
+V00-02: None
+--------------------------------
+No commit
 
 V00-01: 27 June, 2013 Manuel
 --------------------------------
