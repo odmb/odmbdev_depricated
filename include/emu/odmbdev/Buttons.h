@@ -24,6 +24,7 @@
 #include "emu/odmbdev/LogAction.h"
 #include "emu/odmbdev/LongTextBoxAction.h"
 #include "emu/odmbdev/ThreeTextBoxAction.h"
+#include "emu/odmbdev/OneTextBoxAction.h"
 #include "emu/odmbdev/utils.h"
 
 /******************************************************************************
@@ -107,6 +108,17 @@ namespace emu { namespace odmbdev {
     class ReadBackUserCodes : public ButtonAction {
     public:
       ReadBackUserCodes(Crate * crate);
+      void respond(xgi::Input * in, ostringstream & out);
+    };
+
+    /**************************************************************************
+     * ChangeSlotNumber
+     *
+     * A domain-specific-lanaguage for issuing vme commands.
+     *************************************************************************/
+    class ChangeSlotNumber : public OneTextBoxAction {
+    public:
+      ChangeSlotNumber(Crate * crate);
       void respond(xgi::Input * in, ostringstream & out);
     };
 

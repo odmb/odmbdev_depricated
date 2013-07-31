@@ -71,6 +71,7 @@ namespace emu { namespace odmbdev {
              * iterators.
              ***********************************************************************/
             virtual void respond(xgi::Input * in, ostringstream & out) = 0;
+
         protected:
             typedef vector<CFEB>::iterator CFEBItr;
             typedef vector<CFEB>::reverse_iterator CFEBrevItr;
@@ -116,7 +117,7 @@ namespace emu { namespace odmbdev {
 						    const string textbox_default_value2,
 						    const string textboxname3,
 						    const string textbox_default_value3)
-	      throw(xgi::exception::Exception);
+                throw(xgi::exception::Exception);
 
             // static void AddButtonWithFileUpload(xgi::Output *out,
             //                                     const string button_name)

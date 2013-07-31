@@ -1,4 +1,5 @@
 #include "emu/odmbdev/Buttons.h"
+#include "emu/odmbdev/Manager.h"
 
 #include <time.h>
 #include <ctype.h>
@@ -15,6 +16,8 @@
 
 namespace emu { 
   namespace odmbdev {
+
+      int Manager::slot_number = 15;
 
     std::string ToUpper(std::string s){
       for(unsigned int i(0); i<s.length(); ++i){
@@ -57,7 +60,7 @@ namespace emu {
       // ButtonAction::respond(in, out);
       out << "********** VME REGISTER RESET **********" << endl;
       bool debug = false;
-      int slot = 15;
+      int slot = Manager::getSlotNumber();
       unsigned int shiftedSlot = slot << 19;
       char rcv[2];
       // These are the appropriate R/W addresses for register reset
@@ -111,7 +114,7 @@ namespace emu {
     
     void ReprogramDCFEB::respond(xgi::Input * in, ostringstream & out) { // TD
       out << "********** VME REGISTER RESET **********" << endl;
-      int slot = 15;
+      int slot = Manager::getSlotNumber();
       unsigned int shiftedSlot = slot << 19;
       char rcv[2];
       // These are the appropriate R/W addresses for register reset
@@ -124,8 +127,27 @@ namespace emu {
       usleep(100);      
 
       out << "W   3010      1          Reprogram all DCFEBs" << endl;      
-      
     }
+
+    /**************************************************************************
+     * ChangeSlotNumber 
+     *
+     * A domain-specific-lanaguage for issuing vme commands. 
+     *************************************************************************/
+
+    ChangeSlotNumber::ChangeSlotNumber(Crate * crate)
+      : OneTextBoxAction(crate, "update")
+    {
+       //cout << "Updating the slot number box" << endl; 
+    }
+
+    void ChangeSlotNumber::respond(xgi::Input * in, ostringstream & out) {
+      OneTextBoxAction::respond(in, out);
+      out << "********** SLOT NUMBER CHANGE **********" << endl;
+      out << "New slot number: " << Manager::getSlotNumber() << endl;
+    } // End ChangeSlotNumber::respond
+
+
     
     /**************************************************************************
      * ExecuteVMEDSL
@@ -144,10 +166,12 @@ namespace emu {
     
     void ExecuteVMEDSL::respond(xgi::Input * in, ostringstream & out) {
       ThreeTextBoxAction::respond(in, out);
-      
+     
+      cout << "slot number: " << Manager::getSlotNumber() << endl;
+ 
       nCommand++;
       out<<"****************   VME command "<<nCommand<<"   ***************"<<endl;
-      int slot = 15; // hard code a default VME slot number
+      int slot = Manager::getSlotNumber(); // hard code a default VME slot number
 
       //// the arguments for vme_controller ////
       char rcv[2];
@@ -266,7 +290,6 @@ namespace emu {
 	    if(addr_str.size()!=32 || data_str.size()!=32){
 	      out<<"ERROR: address("<<addr_str<<") or data("<<data_str
 		 <<") is not 32 bits on line: "<<line<<endl;
-	      return;
 	    }
 	    // 26th and 25th "bits" from right tell read (10) or write (01)
 	    irdwr = (addr_str.at(addr_str.size()-26)=='1')? 2 : 3; 
@@ -466,7 +489,6 @@ namespace emu {
       
       //// close the logfile -KF
       logfile.close();
-      
     } // End ExecuteVMEDSL::respond
     
     

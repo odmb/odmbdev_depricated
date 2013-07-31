@@ -11,7 +11,6 @@ using namespace cgicc;
 
 namespace emu { namespace odmbdev {
 
-
     /**************************************************************************
      * The Constructor
      *
@@ -57,6 +56,8 @@ namespace emu { namespace odmbdev {
        ***********************************************************************/
 
 //       addActionByTypename<ReadBackUserCodes>(crate);
+      cout<<"Adding slot button"<<endl;
+      addActionByTypename<ChangeSlotNumber>(crate);
       cout<<"Adding button"<<endl;
       addActionByTypename<ExecuteVMEDSL>(crate);
       cout << "Adding test reset button" << endl;
@@ -190,6 +191,8 @@ namespace emu { namespace odmbdev {
 
       *out << cgicc::div()
            << body() << html();
+
+      //      Manager::setSlotNumber(15);
     }
 
     void Manager::commonActionsCallback(xgi::Input *in, xgi::Output *out)

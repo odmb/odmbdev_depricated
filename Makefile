@@ -29,6 +29,7 @@ Sources = \
 	Action.cc \
 	ButtonAction.cc \
 	LongTextBoxAction.cc \
+        OneTextBoxAction.cc \
 	ThreeTextBoxAction.cc \
 	LogAction.cc \
 	Buttons.cc \

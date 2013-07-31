@@ -22,7 +22,7 @@ namespace emu { namespace odmbdev {
   }
   // remember to call this base method with you override it, otherwise
   // textBoxContents will be empty!
-  void ThreeTextBoxAction::respond(xgi::Input * in, ostringstream & out){
+ void ThreeTextBoxAction::respond(xgi::Input * in, ostringstream & out){
     this->textBoxContent1 = getFormValueString("textbox1", in);
     this->textBoxContent2 = getFormValueString("textbox2", in);
     this->textBoxContent3 = getFormValueString("textbox3", in);
