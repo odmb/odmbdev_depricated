@@ -113,12 +113,9 @@ namespace emu { namespace odmbdev {
 				    const string textbox_default_value)
     throw (xgi::exception::Exception)
   {
-    *out << cgicc::input().set("type","submit")
-      .set("value",button_name)
-	 << endl
-	 << cgicc::input().set("type","text")
+    *out << "Slot Number: " << cgicc::input().set("type","text")
       .set("value",textbox_default_value)
-      .set("name",textboxname);
+      .set("name",textboxname) << cgicc::input().set("type","submit").set("value",button_name) << endl;
   }
 
   void Action::AddButtonWithTwoTextBoxes(xgi::Output *out,

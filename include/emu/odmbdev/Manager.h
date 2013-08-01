@@ -68,9 +68,10 @@ namespace emu { namespace odmbdev {
             template <typename T> void addActionByTypename(Crate * crate);
             template <typename T> void addCommonActionByTypename(Crate * crate);
             template <typename T> void addLogActionByTypename(Crate * crate);
-	    static int slot_number;
 	    static int getSlotNumber() {return slot_number;}
 	    static void setSlotNumber(int slot) {slot_number = slot;}            
+        private:
+	    static int slot_number;
 
         protected:
             ostringstream webOutputLog;
