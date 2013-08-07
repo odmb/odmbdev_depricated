@@ -23,7 +23,7 @@
 #include "emu/odmbdev/ButtonAction.h"
 #include "emu/odmbdev/LogAction.h"
 #include "emu/odmbdev/LongTextBoxAction.h"
-#include "emu/odmbdev/ThreeTextBoxAction.h"
+#include "emu/odmbdev/FourTextBoxAction.h"
 #include "emu/odmbdev/OneTextBoxAction.h"
 #include "emu/odmbdev/utils.h"
 
@@ -127,7 +127,7 @@ namespace emu { namespace odmbdev {
      *
      * A domain-specific-lanaguage for issuing vme commands.
      *************************************************************************/
-    class ExecuteVMEDSL : public ThreeTextBoxAction {
+    class ExecuteVMEDSL : public FourTextBoxAction {
     public:
       ExecuteVMEDSL(Crate * crate);
       void respond(xgi::Input * in, ostringstream & out);

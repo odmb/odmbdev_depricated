@@ -160,14 +160,16 @@ namespace emu { namespace odmbdev {
 	 << cgicc::div();
   }
 
-  void Action::AddButtonWithThreeTextBoxes(xgi::Output *out,
+  void Action::AddButtonWithFourTextBoxes(xgi::Output *out,
                                            const string button_name,
                                            const string textboxname1,
                                            const string textbox_default_value1,
                                            const string textboxname2,
                                            const string textbox_default_value2,
                                            const string textboxname3,
-                                           const string textbox_default_value3)
+                                           const string textbox_default_value3,
+                                           const string textboxname4,
+                                           const string textbox_default_value4)
     throw (xgi::exception::Exception){
     *out << cgicc::input().set("type","submit")
       .set("value",button_name)
@@ -179,13 +181,18 @@ namespace emu { namespace odmbdev {
          << cgicc::input().set("type","text").set("style",std::string("width: 468px; margin-top: 1em; "))
       .set("value",textbox_default_value2)
       .set("name",textboxname2)
+         << cgicc::br() << "Box Number: "
+         << cgicc::input().set("type","text").set("style",std::string("width: 50px; margin-top: 1em; "))
+      .set("value",textbox_default_value3)
+      .set("name",textboxname3)
          << endl << cgicc::br() << endl
+
          << cgicc::textarea().set("style",
                                   std::string("width: 515px; ")
                                   + "margin-top: 1em; "
                                   + "height: 500px; ")
-      .set("name", textboxname3)
-         << textbox_default_value3
+      .set("name", textboxname4)
+         << textbox_default_value4
          << cgicc::textarea()
 	 << endl;
     //         << cgicc::div();

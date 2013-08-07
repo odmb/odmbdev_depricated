@@ -30,7 +30,7 @@ Sources = \
 	ButtonAction.cc \
 	LongTextBoxAction.cc \
         OneTextBoxAction.cc \
-	ThreeTextBoxAction.cc \
+	FourTextBoxAction.cc \
 	LogAction.cc \
 	Buttons.cc \
 	version.cc

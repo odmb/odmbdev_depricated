@@ -109,14 +109,16 @@ namespace emu { namespace odmbdev {
                                                  const string textbox_default_value)
                 throw (xgi::exception::Exception);
 
-	    static void AddButtonWithThreeTextBoxes(xgi::Output *out,
+	    static void AddButtonWithFourTextBoxes(xgi::Output *out,
 						    const string button_name,
 						    const string textboxname1,
 						    const string textbox_default_value1,
 						    const string textboxname2,
 						    const string textbox_default_value2,
 						    const string textboxname3,
-						    const string textbox_default_value3)
+						    const string textbox_default_value3,
+						    const string textboxname4,
+						    const string textbox_default_value4)
                 throw(xgi::exception::Exception);
 
             // static void AddButtonWithFileUpload(xgi::Output *out,

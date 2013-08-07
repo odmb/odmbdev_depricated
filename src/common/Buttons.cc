@@ -1,6 +1,7 @@
 #include "emu/odmbdev/Buttons.h"
 #include "emu/odmbdev/Manager.h"
 
+
 #include <time.h>
 #include <ctype.h>
 #include <sys/stat.h>
@@ -156,7 +157,7 @@ namespace emu {
      *************************************************************************/
 
     ExecuteVMEDSL::ExecuteVMEDSL(Crate * crate)
-      : ThreeTextBoxAction(crate, "Run VME commands")
+      : FourTextBoxAction(crate, "Run VME commands")
     {
       cout << " Initializing the DAQMBs, which are VMEModules" << endl; 
       for(vector <DAQMB*>::iterator dmb = dmbs.begin();dmb != dmbs.end(); ++dmb) 
@@ -165,7 +166,7 @@ namespace emu {
     }
     
     void ExecuteVMEDSL::respond(xgi::Input * in, ostringstream & out) {
-      ThreeTextBoxAction::respond(in, out);
+      FourTextBoxAction::respond(in, out);
      
       cout << "slot number: " << Manager::getSlotNumber() << endl;
  
@@ -201,7 +202,25 @@ namespace emu {
       timeinfo = localtime(&rawtime);
 
       char outputfilename[80];
-      strftime( outputfilename, 80, "logfiles/%y_%m_%d_ODMB_testing.log", timeinfo );
+      char outputfilename2[80];
+      stringstream outputfilename3;
+      string box_number = "-1";
+      if (this->textBoxContent3 != "") box_number = (this->textBoxContent3).c_str();
+      if (box_number == "-1"){
+         strftime( outputfilename, 80, "logfiles/%y_%m_%d_ODMB_testing.log", timeinfo );
+      }
+      else {
+         strftime( outputfilename2, 80, "%y_%m_%d_ODMB_testing.log", timeinfo );
+         outputfilename3 << "logfiles/box_" << box_number << "/" << outputfilename2;
+         outputfilename3 >> outputfilename;
+         stringstream outputdirectory2;
+         outputdirectory2 << "logfiles/box_" << box_number;
+         string outputdirectory3;
+         outputdirectory3 = outputdirectory2.str();
+         const char* outputdirectory;
+         outputdirectory = outputdirectory3.c_str(); 
+         mkdir(outputdirectory, S_IRWXU);
+      }
 
       char timestamp[80];
       strftime( timestamp, 80, "%T", timeinfo );
@@ -234,7 +253,7 @@ namespace emu {
       if (textFileMode) {
 	alltext.str(fileContents); // assigns content of text file to alltext, after you push "Execute VME DSL Program" - JB-F
       } else {
-      	alltext.str(this->textBoxContent3); // get the text from the box                                                                                                      
+      	alltext.str(this->textBoxContent4); // get the text from the box                                                                                                      
       }
       string line, buffer;
       getline(countertext,line,'\n');
