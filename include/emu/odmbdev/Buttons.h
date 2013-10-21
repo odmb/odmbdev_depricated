@@ -26,6 +26,7 @@
 #include "emu/odmbdev/FourTextBoxAction.h"
 #include "emu/odmbdev/OneTextBoxAction.h"
 #include "emu/odmbdev/utils.h"
+#include "emu/odmbdev/SingleTextBoxAction.h"
 
 /******************************************************************************
  * The Buttons
