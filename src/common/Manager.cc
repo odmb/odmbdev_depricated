@@ -245,6 +245,11 @@ namespace emu { namespace odmbdev {
       actions.push_back(shared_ptr<T>(new T(crate)));
     }
 
+    template <typename T>
+    void Manager::addActionByTypename(Crate * crate, emu::odmbdev::Manager* manager ) {
+      actions.push_back(shared_ptr<T>(new T(crate, manager)));
+    }
+
     void Manager::addCommonAction(shared_ptr<Action> act) {
       commonActions.push_back(act);
     }

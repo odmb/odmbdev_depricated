@@ -65,6 +65,7 @@ namespace emu { namespace odmbdev {
 
             // These work analgously to the above methods, except they use a bit of
             // STL type hackery to reduce the repitition of the class name
+            template <typename T> void addActionByTypename(emu::pc::Crate * crate, emu::odmbdev::Manager* manager );
             template <typename T> void addActionByTypename(Crate * crate);
             template <typename T> void addCommonActionByTypename(Crate * crate);
             template <typename T> void addLogActionByTypename(Crate * crate);
