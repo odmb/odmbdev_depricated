@@ -32,6 +32,7 @@ namespace emu { namespace odmbdev {
         class Action {
         public:
             Action(Crate * crate);
+            Action(Crate * crate, Manager* manager);
             // a virtual destructor removes a warning about have a class with virtual
             // methods but a non-virtual destructor
             virtual ~Action() { };
