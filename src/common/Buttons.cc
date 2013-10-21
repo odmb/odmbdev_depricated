@@ -561,5 +561,43 @@ namespace emu {
 	(*dmb)->RedirectOutput(&cout);
       }
     }
+
+
+      /**************************************************************************
+       * Load MCS via BPI
+       *
+       * Load MCS to PROM using BPI engine
+       *************************************************************************/
+
+      LoadMCSviaBPI::LoadMCSviaBPI(Crate * crate, emu::odmbdev::Manager* manager)
+          : SingleTextBoxAction(crate, manager, "Load ODMB FW")
+      {
+      }
+
+      void LoadMCSviaBPI::respond(xgi::Input * in, ostringstream & out)
+      {
+          SingleTextBoxAction::respond(in, out);
+          std::string filename(this->textBoxContent);
+          if (filename.empty())
+          {
+              printf("No MCS file specified.  Exiting.\n");
+          }
+          else
+          {
+              if (dmbs_.size() == 0)
+              {
+                  printf("No DMBs found.  Exiting.\n");
+              }
+              else
+              {
+                  for (vector <DAQMB*>::iterator dmb = dmbs_.begin(); dmb != dmbs_.end(); ++dmb)
+                  {
+		    if((*dmb)->GetHardwareVersion() != 2) continue;
+		    (*dmb)->odmb_program_eprom(filename.c_str());
+                  }
+              }
+
+          }
+      } // end LoadMCSviaBPI::respond
   }
 }

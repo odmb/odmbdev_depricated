@@ -152,7 +152,18 @@ namespace emu { namespace odmbdev {
     public:
       ReprogramDCFEB(Crate * crate);
       void respond(xgi::Input * in, ostringstream & out);
-    };      
+    };
+
+    /**************************************************************************
+     * Load MCS via BPI
+     *
+     * Load MCS to PROM using BPI engine
+     *************************************************************************/
+    class LoadMCSviaBPI : public SingleTextBoxAction {
+    public:
+      LoadMCSviaBPI(Crate * crate, emu::odmbdev::Manager* manager);
+      void respond(xgi::Input * in, ostringstream & out);
+    };
   }
 }
 

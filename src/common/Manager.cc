@@ -64,6 +64,8 @@ namespace emu { namespace odmbdev {
       addActionByTypename<ResetRegisters>(crate);
       cout << "Adding reprogram DCFEB button" << endl;
       addActionByTypename<ReprogramDCFEB>(crate);
+      cout << "Adding button to program ODMB FW via VME" << endl;
+      addActionByTypename<LoadMCSviaBPI>(crate, this);
       
       /************************************************************************
        * Log Buttons

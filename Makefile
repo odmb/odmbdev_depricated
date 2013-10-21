@@ -33,6 +33,7 @@ Sources = \
 	FourTextBoxAction.cc \
 	LogAction.cc \
 	Buttons.cc \
+	SingleTextBoxAction.cc \
 	version.cc
 TestSources =
 TestIncludeDirs =
