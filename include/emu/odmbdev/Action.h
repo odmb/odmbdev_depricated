@@ -11,6 +11,7 @@
 #include "cgicc/HTMLClasses.h"
 #include "xcept/tools.h"
 #include "xcept/Exception.h"
+#include "emu/odmbdev/Manager.h"
 
 #include <iostream>
 #include <sstream>
