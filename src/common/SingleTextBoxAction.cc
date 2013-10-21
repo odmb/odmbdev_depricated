@@ -10,7 +10,7 @@ namespace emu { namespace odmbdev {
   }
 
   void SingleTextBoxAction::display(xgi::Output * out){
-    addButtonWithTextBox(out,
+    AddButtonWithTextBox(out,
 			 this->buttonLabel,
 			 "textbox",
 			 "");
