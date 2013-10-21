@@ -2,6 +2,7 @@
 #define __emu_odmbdev_SingleTextBoxAction_h__
 
 #include "emu/odmbdev/Action.h"
+#include "emu/odmbdev/Manager.h"
 
 using namespace std;
 using namespace emu::pc;
