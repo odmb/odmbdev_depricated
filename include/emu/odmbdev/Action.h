@@ -11,7 +11,6 @@
 #include "cgicc/HTMLClasses.h"
 #include "xcept/tools.h"
 #include "xcept/Exception.h"
-#include "emu/odmbdev/Manager.h"
 
 #include <iostream>
 #include <sstream>
@@ -29,11 +28,27 @@
 using namespace std;
 using namespace emu::pc;
 
-namespace emu { namespace odmbdev {
+namespace emu { 
+
+    namespace pc {
+        class Crate;
+        class CFEB;
+        class DAQMB;
+        class CCB;
+        class DDU;
+        class TMB;
+        class ALCTController;
+        class ODAQMB;
+    }
+
+  namespace odmbdev {
+
+    class Manager;
+
         class Action {
         public:
             Action(Crate * crate);
-            Action(Crate * crate, emu::odmbdev::Manager* manager);
+	    Action(Crate * crate, Manager * manager);
             // a virtual destructor removes a warning about have a class with virtual
             // methods but a non-virtual destructor
             virtual ~Action() { };
@@ -78,11 +93,14 @@ namespace emu { namespace odmbdev {
             typedef vector<CFEB>::iterator CFEBItr;
             typedef vector<CFEB>::reverse_iterator CFEBrevItr;
 
-            Crate * crate;
-            vector <DAQMB*> dmbs;
-            vector <DDU*> ddus;
-            TMB* tmb;
-            CCB* ccb;
+
+	    Crate * crate;
+	    std::vector<DAQMB*> dmbs;
+	    std::vector<DDU*> ddus;
+	    TMB* tmb;
+	    CCB* ccb;
+	    ALCTController* alct;
+	    Manager* manager;
 
             static int getFormValueInt(const string form_element, xgi::Input *in);
             static int getFormValueIntHex(const string form_element, xgi::Input *in);

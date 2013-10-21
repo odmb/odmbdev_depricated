@@ -13,14 +13,14 @@ namespace emu { namespace odmbdev {
     dmbs = this->crate->daqmbs();
   }
 
-    Action::Action(Crate * crate, emu::odmbdev::Manager* manager):
-      crate_(crate),
-      dmbs_(crate_->daqmbs()),
-      ddus_(crate_->ddus()),
-      tmb_(crate_->tmbs().at(0)),
-      ccb_(crate_->ccb()),
-      alct_(tmb_->alctController()),
-      manager_(manager)
+    Action::Action(Crate * crate, Manager* manager):
+      crate(crate),
+      dmbs(crate->daqmbs()),
+      ddus(crate->ddus()),
+      tmb(crate->tmbs().at(0)),
+      ccb(crate->ccb()),
+      alct(tmb->alctController()),
+      manager(manager)
     {}
 
   int Action::getFormValueInt(const string form_element, xgi::Input *in)

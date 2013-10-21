@@ -584,13 +584,13 @@ namespace emu {
           }
           else
           {
-              if (dmbs_.size() == 0)
+              if (dmbs.size() == 0)
               {
                   printf("No DMBs found.  Exiting.\n");
               }
               else
               {
-                  for (vector <DAQMB*>::iterator dmb = dmbs_.begin(); dmb != dmbs_.end(); ++dmb)
+                  for (vector <DAQMB*>::iterator dmb = dmbs.begin(); dmb != dmbs.end(); ++dmb)
                   {
 		    if((*dmb)->GetHardwareVersion() != 2) continue;
 		    (*dmb)->odmb_program_eprom(filename.c_str());

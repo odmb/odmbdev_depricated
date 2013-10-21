@@ -3,7 +3,6 @@
 
 #include "emu/odmbdev/Action.h"
 #include "emu/odmbdev/utils.h"
-#include "emu/odmbdev/Manager.h"
 
 using namespace std;
 using namespace emu::pc;
@@ -11,7 +10,7 @@ using namespace emu::pc;
 namespace emu { namespace odmbdev {
     class FourTextBoxAction : public Action {
     public:
-      FourTextBoxAction(Crate * crate, emu::odmbdev::Manager * manager, string buttonLabel);
+      FourTextBoxAction(Crate * crate, string buttonLabel);
 
       void display(xgi::Output * out);
       void respond(xgi::Input * in, ostringstream & out);

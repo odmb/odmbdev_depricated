@@ -1,8 +1,8 @@
 #include "emu/odmbdev/FourTextBoxAction.h"
 
 namespace emu { namespace odmbdev {
-  FourTextBoxAction::FourTextBoxAction(Crate * crate, emu::odmbdev::Manager * manager, string buttonLabel)
-    : Action(crate, manager)
+  FourTextBoxAction::FourTextBoxAction(Crate * crate, string buttonLabel)
+    : Action(crate)
   {
     this->buttonLabel = buttonLabel;
     this->textBoxContent1 = string("");
@@ -12,7 +12,7 @@ namespace emu { namespace odmbdev {
   }
 
   void FourTextBoxAction::display(xgi::Output * out){
-    addButtonWithFourTextBoxes(out,
+    AddButtonWithFourTextBoxes(out,
 				this->buttonLabel,
 				"textbox1",
 				"1",
